@@ -1,36 +1,39 @@
 pipeline {
-  agent any
-  options {
-    buildDiscarder(logRotator(numToKeepStr: '5'))
-  }
-  environment {
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-  }
-  stages {
-    stage('Echo') {
-      steps {
-        sh 'echo "Hello World"'
-      }
+    agent {
+        docker {
+            image 'ubuntu:tag'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
-    // stage('Build') {
-    //   steps {
-    //     sh 'docker build -t cmenezesaus/cmenezesaus/gitops .'
-    //   }
-    // }
-    // stage('Login') {
-    //   steps {
-    //     sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-    //   }
-    // }
-    // stage('Push') {
-    //   steps {
-    //     sh 'docker push cmenezesaus/gitops'
-    //   }
-    // }
-  }
-  // post {
-  //   always {
-  //     sh 'docker logout'
-  //   }
-  // }
+
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
+        IMAGE_NAME = 'cmenezesaus/teste'
+        TAG = 'latest'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                        def customImage = docker.build("${IMAGE_NAME}:${TAG}", '.')
+                        customImage.push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Docker build and push succeeded!'
+        }
+    }
 }
