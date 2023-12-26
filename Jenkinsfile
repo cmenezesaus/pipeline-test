@@ -7,25 +7,30 @@ pipeline {
     DOCKERHUB_CREDENTIALS = credentials('dockerhub')
   }
   stages {
-    stage('Build') {
+    stage('Echo') {
       steps {
-        sh 'docker build -t cmenezesaus/cmenezesaus/gitops .'
+        sh 'echo "Hello World"'
       }
     }
-    stage('Login') {
-      steps {
-        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-      }
-    }
-    stage('Push') {
-      steps {
-        sh 'docker push cmenezesaus/gitops'
-      }
-    }
+    // stage('Build') {
+    //   steps {
+    //     sh 'docker build -t cmenezesaus/cmenezesaus/gitops .'
+    //   }
+    // }
+    // stage('Login') {
+    //   steps {
+    //     sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+    //   }
+    // }
+    // stage('Push') {
+    //   steps {
+    //     sh 'docker push cmenezesaus/gitops'
+    //   }
+    // }
   }
-  post {
-    always {
-      sh 'docker logout'
-    }
-  }
+  // post {
+  //   always {
+  //     sh 'docker logout'
+  //   }
+  // }
 }
