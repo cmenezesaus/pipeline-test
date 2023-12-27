@@ -1,12 +1,20 @@
 pipeline {
-    agent {
-        docker { image 'node:20.10.0-alpine3.19' }
-    }
+    agent any
+
     stages {
-        stage('Test') {
+        stage('Hello World') {
             steps {
-                sh 'node --version'
+                echo 'Hello, World!'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
